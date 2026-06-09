@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirigiendo...</title>
+    <script>
+        // 👇 CAMBIA SOLO TU USUARIO 👇
+        const TU_USUARIO = "TU_USUARIO_GITHUB";
+        // 👆 REPOSITORIO YA ES "go" 👆
+
+        const TU_REPOSITORIO = "go";
+
+        // Obtener el código de la dirección
+        const partes = window.location.pathname.split('/');
+        const codigo = partes[partes.length - 1];
+
+        async function redirigir() {
+            if (!codigo || codigo === "index.html") {
+                document.body.innerHTML = "<h2>⚠️ Código no válido</h2>";
+                return;
+            }
+
+            try {
+                // Leer tu archivo de enlaces público
+                const respuesta = await fetch(
+                    `https://api.github.com/repos/${TU_USUARIO}/${TU_REPOSITORIO}/contents/enlaces.json`
+                );
+                if (!respuesta.ok) throw new Error("No encontrado");
+
+                const datos = await respuesta.json();
+                const enlaces = JSON.parse(atob(datos.content));
+
+                if (enlaces[codigo]) {
+                    window.location.href = enlaces[codigo]; // ¡Te manda al enlace real!
+                } else {
+                    document.body.innerHTML = "<h2>❌ Enlace no existe</h2>";
+                }
+            } catch (error) {
+                document.body.innerHTML = "<h2>❌ Error al cargar datos</h2>";
+            }
+        }
+
+        redirigir();
+    </script>
+</head>
+<body></body>
+</html>
