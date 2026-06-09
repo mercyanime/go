@@ -109,7 +109,7 @@
     </div>
 
     <script>
-        // ✅ TUS DATOS
+        // ✅ TUS DATOS CORRECTOS
         const USUARIO = "mercyanime";
         const REPO = "go";
         const DOMINIO = "https://mercyanime.github.io/go";
@@ -122,17 +122,18 @@
         const textoEnlace = document.getElementById("enlaceCorto");
         const btnCopiar = document.getElementById("copiar");
 
-        // Generar código
+        // Generar código aleatorio
         function generarCodigo() {
             const letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             let codigo = "";
-            for (let i = 0; i < 5; i++) codigo += letras[Math.floor(Math.random() * letras.length)];
+            for (let i = 0; i < 5; i++) {
+                codigo += letras[Math.floor(Math.random() * letras.length)];
+            }
             return codigo;
         }
 
-        // ✅ GUARDAMOS EL ARCHIVO DIRECTAMENTE CON EL CÓDIGO
+        // Guardar archivo en GitHub
         async function guardar(codigo, destino) {
-            // Este archivo al abrirse REDIRIGE DIRECTO, no hay nada más
             const contenido = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.replace("${destino}");</script></head><body></body></html>`;
             
             await fetch(`https://api.github.com/repos/${USUARIO}/${REPO}/contents/${codigo}.html`, {
@@ -143,16 +144,13 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    message: `Enlace: ${codigo}`,
+                    message: `Enlace creado: ${codigo}`,
                     content: btoa(contenido)
                 })
             });
         }
 
-        // ✅ SISTEMA NUEVO: EL ENLACE YA INCLUYE EL .html
-        // YA NO USAMOS REDIRECCIÓN EN ESTE ARCHIVO, NI EL 404
-
-        // Acción al cortar
+        // Acción al presionar botón
         boton.addEventListener("click", async () => {
             let urlLarga = input.value.trim();
             if (!urlLarga) return alert("⚠️ Pon un enlace válido");
@@ -162,7 +160,6 @@
             res.style.display = "none";
 
             const codigo = generarCodigo();
-            // ✅ EL ENLACE SE GENERA ASÍ: https://mercyanime.github.io/go/a1B2c.html
             const urlCorta = `${DOMINIO}/${codigo}.html`;
 
             try {
@@ -173,7 +170,7 @@
 
                 btnCopiar.onclick = () => {
                     navigator.clipboard.writeText(urlCorta);
-                    alert("✅ ¡LISTO! VA DIRECTO, NUNCA REGRESA");
+                    alert("✅ ¡AZUL Y PERFECTO! VA DIRECTO");
                 };
 
             } catch (e) {
