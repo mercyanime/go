@@ -4,39 +4,36 @@
     <meta charset="UTF-8">
     <title>Redirigiendo...</title>
     <script>
-        // 👇 CAMBIA SOLO TU USUARIO 👇
-        const TU_USUARIO = "TU_USUARIO_GITHUB";
-        // 👆 REPOSITORIO YA ES "go" 👆
-
+        // ✅ TUS DATOS YA CONFIGURADOS
+        const TU_USUARIO = "mercyanime";
         const TU_REPOSITORIO = "go";
 
-        // Obtener el código de la dirección
+        // Sacar el código de la dirección
         const partes = window.location.pathname.split('/');
         const codigo = partes[partes.length - 1];
 
         async function redirigir() {
-            if (!codigo || codigo === "index.html") {
-                document.body.innerHTML = "<h2>⚠️ Código no válido</h2>";
+            if(!codigo || codigo === "index.html") {
+                document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px;'>🔗 Acortador activo</h2>";
                 return;
             }
 
             try {
-                // Leer tu archivo de enlaces público
-                const respuesta = await fetch(
-                    `https://api.github.com/repos/${TU_USUARIO}/${TU_REPOSITORIO}/contents/enlaces.json`
-                );
-                if (!respuesta.ok) throw new Error("No encontrado");
+                // Leer el archivo con todos los enlaces
+                const res = await fetch(`https://api.github.com/repos/${TU_USUARIO}/${TU_REPOSITORIO}/contents/enlaces.json`);
+                if(!res.ok) throw new Error();
 
-                const datos = await respuesta.json();
+                const datos = await res.json();
                 const enlaces = JSON.parse(atob(datos.content));
 
-                if (enlaces[codigo]) {
-                    window.location.href = enlaces[codigo]; // ¡Te manda al enlace real!
+                // Si existe, manda directo
+                if(enlaces[codigo]) {
+                    window.location.href = enlaces[codigo];
                 } else {
-                    document.body.innerHTML = "<h2>❌ Enlace no existe</h2>";
+                    document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px; color:red;'>❌ Enlace no existe</h2>";
                 }
-            } catch (error) {
-                document.body.innerHTML = "<h2>❌ Error al cargar datos</h2>";
+            } catch(e) {
+                document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px; color:red;'>❌ Error al cargar datos</h2>";
             }
         }
 
