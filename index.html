@@ -3,201 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔗 Acortador Mercy</title>
+    <title>Acortador Mercy</title>
     <style>
-        * {margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif;}
-
+        * {margin:0; padding:0; box-sizing:border-box; font-family:Arial}
         body {
-            background-color: #eff6ff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
+            background:#eff6ff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            min-height:100vh;
+            padding:20px
         }
-
-        .contenedor {
-            background-color: #ffffff;
-            padding: 30px 25px;
-            border-radius: 10px;
-            border: 2px solid #bfdbfe;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
+        .caja {
+            background:#fff;
+            padding:30px 25px;
+            border-radius:10px;
+            border:2px solid #bfdbfe;
+            width:100%;
+            max-width:450px;
+            text-align:center
         }
-
         h1 {
-            color: #1e40af;
-            font-size: 20px;
-            margin-bottom: 20px;
+            color:#1e40af;
+            font-size:20px;
+            margin-bottom:20px
         }
-
         input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #93c5fd;
-            border-radius: 6px;
-            background-color: #eff6ff;
-            color: #1e40af;
-            font-size: 15px;
-            margin-bottom: 15px;
+            width:100%;
+            padding:12px 15px;
+            border:2px solid #93c5fd;
+            border-radius:6px;
+            background:#eff6ff;
+            color:#1e40af;
+            font-size:15px;
+            margin-bottom:15px;
+            outline:none
         }
-
         button {
-            width: 100%;
-            padding: 12px;
-            background-color: #3b82f6;
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
+            width:100%;
+            padding:12px;
+            background:#3b82f6;
+            color:#fff;
+            border:none;
+            border-radius:6px;
+            font-size:15px;
+            font-weight:bold;
+            cursor:pointer
         }
-
-        button:hover {
-            background-color: #1d4ed8;
-        }
-
+        button:hover {background:#1d4ed8}
         .resultado {
-            margin-top: 15px;
-            padding: 12px;
-            background-color: #eff6ff;
-            border-radius: 6px;
-            display: none;
+            margin-top:15px;
+            padding:12px;
+            background:#eff6ff;
+            border-radius:6px;
+            display:none
         }
-
         .enlace {
-            color: #1e40af;
-            font-weight: bold;
-            margin: 8px 0;
-            word-break: break-all;
+            color:#1e40af;
+            font-weight:bold;
+            margin:8px 0;
+            word-break:break-all
         }
-
         .copiar {
-            background-color: #60a5fa;
-            padding: 6px 12px;
-            font-size: 13px;
-            width: auto;
-            margin-top: 8px;
+            background:#60a5fa;
+            padding:6px 12px;
+            font-size:13px;
+            width:auto;
+            margin-top:8px
         }
-
-        .texto-pequeno {
-            color: #1e40af;
-            font-size: 11px;
-            margin-top: 10px;
-            opacity: 0.8;
+        .aviso {
+            color:#1e40af;
+            font-size:11px;
+            margin-top:10px;
+            opacity:0.8
         }
-
         .cargando {
-            color: #1e40af;
-            margin: 8px 0;
-            display: none;
-            font-weight: bold;
+            color:#1e40af;
+            margin:8px 0;
+            display:none;
+            font-weight:bold
         }
     </style>
 </head>
 <body>
 
-    <div class="contenedor">
+    <div class="caja">
         <h1>🔗 Acortador Mercy</h1>
-
-        <input type="text" id="entradaUrl" placeholder="Pega aquí tu enlace...">
-
-        <button id="botonCortar">✨ Cortar Enlace</button>
-
-        <p class="cargando" id="estadoCarga">⏳ Creando enlace...</p>
-
-        <div class="resultado" id="zonaResultado">
-            <p>✅ Enlace listo:</p>
-            <div class="enlace" id="textoEnlaceCorto"></div>
+        <input type="text" id="campoUrl" placeholder="Pega aquí tu enlace...">
+        <button id="botonAccion">✨ Cortar Enlace</button>
+        <p class="cargando" id="mensajeCarga">⏳ Creando...</p>
+        <div class="resultado" id="zonaFinal">
+            <p>✅ Listo:</p>
+            <div class="enlace" id="textoEnlace"></div>
             <button class="copiar" id="botonCopiar">📋 Copiar</button>
         </div>
-
-        <p class="texto-pequeno">Al usar este servicio aceptas los términos</p>
+        <p class="aviso">Al usar este servicio aceptas los términos</p>
     </div>
 
-    <script>
-        // TUS DATOS
-        const USUARIO = "mercyanime";
-        const REPOSITORIO = "go";
-        const DOMINIO = "https://mercyanime.github.io/go";
-        const TOKEN = "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";
+<script>
+// DATOS FIJOS
+var USUARIO = "mercyanime";
+var REPO = "go";
+var DOMINIO = "https://mercyanime.github.io/go";
+var TOKEN = "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";
 
-        // ELEMENTOS
-        const inputUrl = document.getElementById("entradaUrl");
-        const btnCortar = document.getElementById("botonCortar");
-        const estadoCarga = document.getElementById("estadoCarga");
-        const zonaResultado = document.getElementById("zonaResultado");
-        const textoEnlace = document.getElementById("textoEnlaceCorto");
-        const btnCopiar = document.getElementById("botonCopiar");
+// ELEMENTOS
+var inputUrl = document.getElementById("campoUrl");
+var boton = document.getElementById("botonAccion");
+var carga = document.getElementById("mensajeCarga");
+var zonaRes = document.getElementById("zonaFinal");
+var textoRes = document.getElementById("textoEnlace");
+var btnCopiar = document.getElementById("botonCopiar");
 
-        // GENERAR CÓDIGO
-        function generarCodigo() {
-            const caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            let codigoFinal = "";
-            for (let i = 0; i < 5; i++) {
-                const aleatorio = Math.floor(Math.random() * caracteres.length);
-                codigoFinal += caracteres[aleatorio];
-            }
-            return codigoFinal;
-        }
+// GENERADOR DE CODIGO
+function generarCodigo(){
+    var letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var res = "";
+    for(var i=0; i<5; i++){
+        res += letras.charAt(Math.floor(Math.random() * letras.length));
+    }
+    return res;
+}
 
-        // GUARDAR EN GITHUB
-        async function guardarEnGithub(codigo, urlDestino) {
-            const contenido = '<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.replace("' + urlDestino + '");</script></head><body></body></html>';
-            
-            await fetch('https://api.github.com/repos/' + USUARIO + '/' + REPOSITORIO + '/contents/' + codigo + '.html', {
-                method: "PUT",
-                headers: {
-                    "Authorization": "token " + TOKEN,
-                    "Accept": "application/vnd.github.v3+json",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: "Enlace creado: " + codigo,
-                    content: btoa(contenido)
-                })
-            });
-        }
+// GUARDAR EN GITHUB
+async function guardarArchivo(codigo, destino){
+    var contenido = '<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.replace("'+destino+'");</script></head><body></body></html>';
+    
+    var peticion = await fetch("https://api.github.com/repos/"+USUARIO+"/"+REPO+"/contents/"+codigo+".html", {
+        method: "PUT",
+        headers: {
+            "Authorization": "token "+TOKEN,
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: "Enlace creado",
+            content: btoa(contenido)
+        })
+    });
+    return peticion.json();
+}
 
-        // ACCIÓN AL CORTAR
-        btnCortar.addEventListener("click", async function() {
-            let urlOriginal = inputUrl.value.trim();
+// ACCION PRINCIPAL
+boton.addEventListener("click", async function(){
+    var urlLarga = inputUrl.value.trim();
+    if(!urlLarga){
+        alert("Pon un enlace valido");
+        return;
+    }
+    if(urlLarga.substring(0,4) != "http"){
+        urlLarga = "https://" + urlLarga;
+    }
 
-            if (!urlOriginal) {
-                alert("⚠️ Pon un enlace válido");
-                return;
-            }
+    carga.style.display = "block";
+    zonaRes.style.display = "none";
 
-            if (!urlOriginal.startsWith("http")) {
-                urlOriginal = "https://" + urlOriginal;
-            }
+    var codigoNuevo = generarCodigo();
+    var enlaceFinal = DOMINIO + "/" + codigoNuevo + ".html";
 
-            estadoCarga.style.display = "block";
-            zonaResultado.style.display = "none";
+    try {
+        await guardarArchivo(codigoNuevo, urlLarga);
+        textoRes.textContent = enlaceFinal;
+        zonaRes.style.display = "block";
+        carga.style.display = "none";
 
-            const codigoNuevo = generarCodigo();
-            const enlaceCorto = DOMINIO + "/" + codigoNuevo + ".html";
+        btnCopiar.onclick = function(){
+            navigator.clipboard.writeText(enlaceFinal);
+            alert("¡Perfecto! Va directo");
+        };
 
-            try {
-                await guardarEnGithub(codigoNuevo, urlOriginal);
-
-                textoEnlace.textContent = enlaceCorto;
-                zonaResultado.style.display = "block";
-                estadoCarga.style.display = "none";
-
-                btnCopiar.onclick = function() {
-                    navigator.clipboard.writeText(enlaceCorto);
-                    alert("✅ ¡PERFECTO! VA DIRECTO");
-                };
-
-            } catch (error) {
-                alert("❌ Error: " + error);
-                estadoCarga.style.display = "none";
-            }
-        });
-    </script>
+    } catch(err) {
+        alert("Error: " + err);
+        carga.style.display = "none";
+    }
+});
+</script>
 
 </body>
 </html>
