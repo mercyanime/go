@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>🔗 Acortador Mercy</title>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:Arial}
+
+        body {
+            background: #eff6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .caja {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 10px;
+            border: 2px solid #bfdbfe;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #1e40af;
+            font-size: 20px;
+            margin-bottom: 18px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 2px solid #93c5fd;
+            border-radius: 7px;
+            background: #eff6ff;
+            color: #1e40af;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {background: #1d4ed8;}
+
+        .resultado {
+            margin-top: 15px;
+            padding: 12px;
+            background: #eff6ff;
+            border-radius: 7px;
+            display: none;
+        }
+
+        .enlace {
+            color: #1e40af;
+            font-weight: bold;
+            margin: 8px 0;
+            word-break: break-all;
+        }
+
+        .copiar {
+            background: #60a5fa;
+            padding: 7px 14px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        .aviso {
+            color: #1e40af;
+            font-size: 11px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .cargando {
+            color: #1e40af;
+            margin: 8px 0;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="caja">
+        <h1>🔗 Acortador Mercy</h1>
+        <input type="text" id="url" placeholder="Pega aquí tu enlace...">
+        <button id="boton">✨ Cortar Enlace</button>
+        <p class="cargando" id="cargando">⏳ Creando...</p>
+        <div class="resultado" id="res">
+            <p>✅ Listo:</p>
+            <div class="enlace" id="enlaceCorto"></div>
+            <button class="copiar" id="copiar">📋 Copiar</button>
+        </div>
+        <p class="aviso">Al usar este servicio aceptas los términos</p>
+    </div>
+
+    <script>
+        // ✅ TUS DATOS
+        const USUARIO = "mercyanime";
+        const REPO = "go";
+        const DOMINIO = "https://mercyanime.github.io/go";
+        const TOKEN = "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";
+
+        const input = document.getElementById("url");
+        const boton = document.getElementById("boton");
+        const cargando = document.getElementById("cargando");
+        const res = document.getElementById("res");
+        const textoEnlace = document.getElementById("enlaceCorto");
+        const btnCopiar = document.getElementById("copiar");
+
+        // Generar código
+        function generarCodigo() {
+            const letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let codigo = "";
+            for (let i = 0; i < 5; i++) codigo += letras[Math.floor(Math.random() * letras.length)];
+            return codigo;
+        }
+
+        // ✅ GUARDAMOS EL ARCHIVO DIRECTAMENTE CON EL CÓDIGO
+        async function guardar(codigo, destino) {
+            // Este archivo al abrirse REDIRIGE DIRECTO, no hay nada más
+            const contenido = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.replace("${destino}");</script></head><body></body></html>`;
+            
+            await fetch(`https://api.github.com/repos/${USUARIO}/${REPO}/contents/${codigo}.html`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${TOKEN}`,
+                    "Accept": "application/vnd.github.v3+json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: `Enlace: ${codigo}`,
+                    content: btoa(contenido)
+                })
+            });
+        }
+
+        // ✅ SISTEMA NUEVO: EL ENLACE YA INCLUYE EL .html
+        // YA NO USAMOS REDIRECCIÓN EN ESTE ARCHIVO, NI EL 404
+
+        // Acción al cortar
+        boton.addEventListener("click", async () => {
+            let urlLarga = input.value.trim();
+            if (!urlLarga) return alert("⚠️ Pon un enlace válido");
+            if (!urlLarga.startsWith("http")) urlLarga = "https://" + urlLarga;
+
+            cargando.style.display = "block";
+            res.style.display = "none";
+
+            const codigo = generarCodigo();
+            // ✅ EL ENLACE SE GENERA ASÍ: https://mercyanime.github.io/go/a1B2c.html
+            const urlCorta = `${DOMINIO}/${codigo}.html`;
+
+            try {
+                await guardar(codigo, urlLarga);
+                textoEnlace.textContent = urlCorta;
+                res.style.display = "block";
+                cargando.style.display = "none";
+
+                btnCopiar.onclick = () => {
+                    navigator.clipboard.writeText(urlCorta);
+                    alert("✅ ¡LISTO! VA DIRECTO, NUNCA REGRESA");
+                };
+
+            } catch (e) {
+                alert("❌ Error: " + e);
+                cargando.style.display = "none";
+            }
+        });
+    </script>
+
+</body>
+</html>
