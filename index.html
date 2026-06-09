@@ -2,12 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔗 Acortador Mercy</title>
     <style>
-        * {margin:0; padding:0; box-sizing:border-box; font-family:Arial}
+        * {margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif;}
 
         body {
-            background: #eff6ff;
+            background-color: #eff6ff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -15,52 +16,54 @@
             padding: 20px;
         }
 
-        .caja {
-            background: white;
-            padding: 35px 25px;
+        .contenedor {
+            background-color: #ffffff;
+            padding: 30px 25px;
             border-radius: 10px;
             border: 2px solid #bfdbfe;
             width: 100%;
-            max-width: 480px;
+            max-width: 450px;
             text-align: center;
         }
 
         h1 {
             color: #1e40af;
             font-size: 20px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         input {
             width: 100%;
-            padding: 13px;
+            padding: 12px 15px;
             border: 2px solid #93c5fd;
-            border-radius: 7px;
-            background: #eff6ff;
+            border-radius: 6px;
+            background-color: #eff6ff;
             color: #1e40af;
             font-size: 15px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         button {
             width: 100%;
-            padding: 13px;
-            background: #3b82f6;
-            color: white;
+            padding: 12px;
+            background-color: #3b82f6;
+            color: #ffffff;
             border: none;
-            border-radius: 7px;
+            border-radius: 6px;
             font-size: 15px;
             font-weight: bold;
             cursor: pointer;
         }
 
-        button:hover {background: #1d4ed8;}
+        button:hover {
+            background-color: #1d4ed8;
+        }
 
         .resultado {
             margin-top: 15px;
             padding: 12px;
-            background: #eff6ff;
-            border-radius: 7px;
+            background-color: #eff6ff;
+            border-radius: 6px;
             display: none;
         }
 
@@ -72,16 +75,17 @@
         }
 
         .copiar {
-            background: #60a5fa;
-            padding: 7px 14px;
+            background-color: #60a5fa;
+            padding: 6px 12px;
             font-size: 13px;
             width: auto;
+            margin-top: 8px;
         }
 
-        .aviso {
+        .texto-pequeno {
             color: #1e40af;
             font-size: 11px;
-            margin-top: 8px;
+            margin-top: 10px;
             opacity: 0.8;
         }
 
@@ -95,87 +99,102 @@
 </head>
 <body>
 
-    <div class="caja">
+    <div class="contenedor">
         <h1>🔗 Acortador Mercy</h1>
-        <input type="text" id="url" placeholder="Pega aquí tu enlace...">
-        <button id="boton">✨ Cortar Enlace</button>
-        <p class="cargando" id="cargando">⏳ Creando...</p>
-        <div class="resultado" id="res">
-            <p>✅ Listo:</p>
-            <div class="enlace" id="enlaceCorto"></div>
-            <button class="copiar" id="copiar">📋 Copiar</button>
+
+        <input type="text" id="entradaUrl" placeholder="Pega aquí tu enlace...">
+
+        <button id="botonCortar">✨ Cortar Enlace</button>
+
+        <p class="cargando" id="estadoCarga">⏳ Creando enlace...</p>
+
+        <div class="resultado" id="zonaResultado">
+            <p>✅ Enlace listo:</p>
+            <div class="enlace" id="textoEnlaceCorto"></div>
+            <button class="copiar" id="botonCopiar">📋 Copiar</button>
         </div>
-        <p class="aviso">Al usar este servicio aceptas los términos</p>
+
+        <p class="texto-pequeno">Al usar este servicio aceptas los términos</p>
     </div>
 
     <script>
-        // ✅ TUS DATOS CORRECTOS
+        // TUS DATOS
         const USUARIO = "mercyanime";
-        const REPO = "go";
+        const REPOSITORIO = "go";
         const DOMINIO = "https://mercyanime.github.io/go";
         const TOKEN = "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";
 
-        const input = document.getElementById("url");
-        const boton = document.getElementById("boton");
-        const cargando = document.getElementById("cargando");
-        const res = document.getElementById("res");
-        const textoEnlace = document.getElementById("enlaceCorto");
-        const btnCopiar = document.getElementById("copiar");
+        // ELEMENTOS
+        const inputUrl = document.getElementById("entradaUrl");
+        const btnCortar = document.getElementById("botonCortar");
+        const estadoCarga = document.getElementById("estadoCarga");
+        const zonaResultado = document.getElementById("zonaResultado");
+        const textoEnlace = document.getElementById("textoEnlaceCorto");
+        const btnCopiar = document.getElementById("botonCopiar");
 
-        // Generar código aleatorio
+        // GENERAR CÓDIGO
         function generarCodigo() {
-            const letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            let codigo = "";
+            const caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let codigoFinal = "";
             for (let i = 0; i < 5; i++) {
-                codigo += letras[Math.floor(Math.random() * letras.length)];
+                const aleatorio = Math.floor(Math.random() * caracteres.length);
+                codigoFinal += caracteres[aleatorio];
             }
-            return codigo;
+            return codigoFinal;
         }
 
-        // Guardar archivo en GitHub
-        async function guardar(codigo, destino) {
-            const contenido = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.replace("${destino}");</script></head><body></body></html>`;
+        // GUARDAR EN GITHUB
+        async function guardarEnGithub(codigo, urlDestino) {
+            const contenido = '<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.replace("' + urlDestino + '");</script></head><body></body></html>';
             
-            await fetch(`https://api.github.com/repos/${USUARIO}/${REPO}/contents/${codigo}.html`, {
+            await fetch('https://api.github.com/repos/' + USUARIO + '/' + REPOSITORIO + '/contents/' + codigo + '.html', {
                 method: "PUT",
                 headers: {
-                    "Authorization": `token ${TOKEN}`,
+                    "Authorization": "token " + TOKEN,
                     "Accept": "application/vnd.github.v3+json",
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    message: `Enlace creado: ${codigo}`,
+                    message: "Enlace creado: " + codigo,
                     content: btoa(contenido)
                 })
             });
         }
 
-        // Acción al presionar botón
-        boton.addEventListener("click", async () => {
-            let urlLarga = input.value.trim();
-            if (!urlLarga) return alert("⚠️ Pon un enlace válido");
-            if (!urlLarga.startsWith("http")) urlLarga = "https://" + urlLarga;
+        // ACCIÓN AL CORTAR
+        btnCortar.addEventListener("click", async function() {
+            let urlOriginal = inputUrl.value.trim();
 
-            cargando.style.display = "block";
-            res.style.display = "none";
+            if (!urlOriginal) {
+                alert("⚠️ Pon un enlace válido");
+                return;
+            }
 
-            const codigo = generarCodigo();
-            const urlCorta = `${DOMINIO}/${codigo}.html`;
+            if (!urlOriginal.startsWith("http")) {
+                urlOriginal = "https://" + urlOriginal;
+            }
+
+            estadoCarga.style.display = "block";
+            zonaResultado.style.display = "none";
+
+            const codigoNuevo = generarCodigo();
+            const enlaceCorto = DOMINIO + "/" + codigoNuevo + ".html";
 
             try {
-                await guardar(codigo, urlLarga);
-                textoEnlace.textContent = urlCorta;
-                res.style.display = "block";
-                cargando.style.display = "none";
+                await guardarEnGithub(codigoNuevo, urlOriginal);
 
-                btnCopiar.onclick = () => {
-                    navigator.clipboard.writeText(urlCorta);
-                    alert("✅ ¡AZUL Y PERFECTO! VA DIRECTO");
+                textoEnlace.textContent = enlaceCorto;
+                zonaResultado.style.display = "block";
+                estadoCarga.style.display = "none";
+
+                btnCopiar.onclick = function() {
+                    navigator.clipboard.writeText(enlaceCorto);
+                    alert("✅ ¡PERFECTO! VA DIRECTO");
                 };
 
-            } catch (e) {
-                alert("❌ Error: " + e);
-                cargando.style.display = "none";
+            } catch (error) {
+                alert("❌ Error: " + error);
+                estadoCarga.style.display = "none";
             }
         });
     </script>
